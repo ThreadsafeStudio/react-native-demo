@@ -15,7 +15,10 @@ export default class List extends Component {
   onButtonPressed(e) {
     this.props.navigator.push({
       component: Detail,
-      props: {data: e},
+      props: {
+        data: e,
+        title: e
+      },
       // transition: Platform.OS === "android" ? Navigator.SceneConfigs.FloatFromBottomAndroid : Navigator.SceneConfigs.FloatFromBottom,
     })
   }
