@@ -6,12 +6,21 @@ import {
   ScrollView,
   Text,
   TouchableHighlight,
-  View
+  View,
+  InteractionManager
 } from 'react-native';
 import Detail from './Detail'
+import * as Api from '../services/Api'
 
 
 export default class List extends Component {
+  constructor() {
+    super()
+    this.state = {
+      items: null
+    }
+  }
+
   onButtonPressed(e) {
     this.props.navigator.push({
       component: Detail,
@@ -24,27 +33,43 @@ export default class List extends Component {
   }
 
   renderList() {
-    return (
-      ["Item One", "Item Two", "Item Three"].map(e => {
-        return (
-          <TouchableHighlight
-            key={e}
-            style={styles.listItem}
-            underlayColor={'#eee'}
-            onPress={this.onButtonPressed.bind(this, e)}>
-            <Text>{e}</Text>
-          </TouchableHighlight>
-        )
-      })
-    )
+    if (this.state.items === null) {
+      return <Text>No data to show :(</Text>
+    } else {
+      return (
+        <ScrollView style={styles.scroll}>
+          {this.state.items.map(e => {
+            let name = e.name
+            return (
+              <TouchableHighlight
+                key={name}
+                style={styles.listItem}
+                underlayColor={'#eee'}
+                onPress={this.onButtonPressed.bind(this, name)}>
+                <Text>{name}</Text>
+              </TouchableHighlight>
+            )
+          })}
+        </ScrollView>
+      )
+    }
+  }
+
+  componentDidMount() {
+    InteractionManager.runAfterInteractions(() => {
+      Api.getDemoList()
+        .then(r => r.json())
+        .then(d => {
+          let items = d.data
+          this.setState({items})
+        })
+    })
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView style={styles.scroll}>
-            {this.renderList()}
-        </ScrollView>
+        {this.renderList()}
       </View>
     )
   }
